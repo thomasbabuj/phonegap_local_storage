@@ -1,3 +1,8 @@
+<!--
+    Local storage - 
+    http://www.youtube.com/watch?v=SRsCYFzRxUM
+-->    
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -22,13 +27,43 @@
                 var foodList = document.getElementById("foodList");
                 var foodField = document.getElementById("foodName");
                 var foodForm = document.getElementById("foodForm");
+                var clearStorage = document.getElementById("clearStorage");
+                var length = window.localStorage.length;                
+                var storedFoodName;
+
+                clearStorage.addEventListener("click", function(){
+                    window.localStorage.clear();
+                    alert("DD");
+                    showExistingFoodItems();
+                }, false);
+
+                function addNewFoodItem(foodName) {
+                    var newFoodItem = document.createElement("li");
+                        newFoodItem.innerHTML = foodName;
+                        foodList.appendChild(newFoodItem);
+                }
+
+                function showExistingFoodItems(){
+                    for(var i=0; i < length; i++) {
+                        storedFoodName = window.localStorage.key(i);
+                        console.log (storedFoodName);
+                            if(storedFoodName.match(/^food([0-9]+)$/)) {
+                                console.log ("match found");
+                                addNewFoodItem(window.localStorage.getItem(storedFoodName));
+                            }
+                    }
+                }
+
+
+
+                showExistingFoodItems();
 
                 foodForm.addEventListener("submit", function(evt) {
                     evt.preventDefault();
                     var newFood = foodField.value;
-                    var newFoodItem = document.createElement("li");
-                        newFoodItem.innerHTML = newFood;
-                    foodList.appendChild(newFoodItem);
+                    var foodkey = "food"+ (window.localStorage.length + 1);
+                    addNewFoodItem(newFood);
+                    window.localStorage.setItem(foodkey, newFood);
                     foodField.value = '';
                     return false;
                 }, false);
@@ -40,8 +75,10 @@
             <h1>List some food</h1>
             <form id="foodForm">
                 <input type="text" id="foodName" placeholder="Enter your food name" />
-                <button id="submitFood">Tell Us!</button>
+                <button id="submitFood">Tell Us!</button> <br />
+                <button id="clearStorage">Remove Values</button>
             </form>
+            
             <ul id="foodList"></ul>
         </div>
     </body>
