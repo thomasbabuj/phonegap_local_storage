@@ -22,6 +22,45 @@
             }
 
         </style>
+        <script src="js/mustache.js"></script>
+        <script>
+            var storedTemplate = null;
+
+            function renderOurTemplate( view ) {
+                function doRender(template, view) {
+                    console.log( "rendering now");
+                    console.log (Mustache.to_html(tempalte, view));
+                }
+
+                if (storedTemplate) {
+                    console.log ( "template is stored - we can render now");
+                    doRender(stroedTemplate, view);
+                } else {
+                    console.log ("tempalte isn't stored - need to request it");
+                    var req = new XMLHttpRequest();
+                    req.onreadystagechange = function() {
+                        if ( this.readyState == 4) {
+                            if ( this.status == 200 || this.status == 0) {
+                                storedTemplate = this.responsText;
+                                doRender( storedTemplate, view);
+                            } else {
+                                console.log ("something went wrong");
+                            }
+                        }
+                    }
+                    req.open("GET", "food_details.mustache", true);
+                    req.send();
+                }
+            }
+        </script>
+        <script>
+            var aFoodDetails = {
+                foodName : "cereal",
+                timeOfDay : function() {
+                    return this.foodName.length > 7 ? "eventing" : "morning";
+                }
+            }
+        </script>
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 var foodList = document.getElementById("foodList");
