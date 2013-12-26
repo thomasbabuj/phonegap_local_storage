@@ -1,44 +1,58 @@
 <!--
     Local storage - 
     http://www.youtube.com/watch?v=SRsCYFzRxUM
--->    
-
+-->  
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" contents="width=device-width, initial-scale=1.0, user-scalable=no" />
-        <title>Sites Without Servers</title>
-        <style>
-            body {
-                background: white;
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+        <title>Sites without servers</title>
+    </head>
+    <body>
+        <div id="main">
+            <h1>List some food</h1>
+            <form id="foodForm">
+                <input type="text" id="foodName" placeholder="A name of a food" />
+                <button id="submitFood">Tell Us!</button> <br/>
+            </form>
+            <div id="foodDescription"></div>
+            <ul id="foodList"></ul>
+        </div>
+    </body>
+    <style>
+        body {
+            background: white;
+        }
+        div#main{
+            border: black 1px solid;
+            height: 82%;
+            width: 80%;
+            padding: 10%;
+            -webkit-border-radius: 8px;
+        }
+    </style>
+    <script src="js/mustache.js"></script>
+    <script>
+        // Mustache view
+        var aFoodDetail = {
+            foodName : "ceral",
+            timeOfDay : function() {
+                return this.foodName.length > 7 ? "evening" : "morning";
             }
-            div#main {
-                border: black 1px solid;
-                height: 82%;
-                width: 80%;
-                padding: 10%;
-                -webkit-border-radius: 8px;
-            }
+        }
 
-        </style>
-        <script src="js/mustache.js"></script>
-        <script>
-            var aFoodDetails = {
-                foodName : "cereal",
-                timeOfDay : function() {
-                    return this.foodName.length > 7 ? "eventing" : "morning";
+        //Rendring Mustache view
+        var storedTemplate = null;
+
+        function renderOurTemplate(view, callback) {
+
+                function doRender(template, view) {
+                    console.log (" rendering now");
+                    console.log (Mustache.to_html(template, view));
+                    callback(Mustache.to_html(template, view));
                 }
-            };
 
-            var storedTemplate = null;
-
-            function doRender(template,view) {
-                console.log("rendering now");
-                console.log(Mustache.to_html(template, view));
-            }
-
-            function renderOurTemplate(view) {
                 if (storedTemplate) {
                     console.log ("template is stored - we can render immediately");
                     doRender(storedTemplate, view);
@@ -60,67 +74,62 @@
                 }
 
             }
-        </script>
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
 
+            var foodList = document.getElementById("foodList");
+            var foodField = document.getElementById("foodName");
+            var foodForm  = document.getElementById("foodForm");
 
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                var foodList = document.getElementById("foodList");
-                var foodField = document.getElementById("foodName");
-                var foodForm = document.getElementById("foodForm");
-                var clearStorage = document.getElementById("clearStorage");
-                var length = window.localStorage.length;                
-                var storedFoodName;
+            //Adding values to the local storage
+            var length = window.localStorage.length;
+            var i = 0;
+            var storedFoodName;
 
-                clearStorage.addEventListener("click", function(){
-                    window.localStorage.clear();
-                    alert("DD");
-                    showExistingFoodItems();
-                }, false);
+            //Adding New Food Item in the list
+            function addNewFoodItem(foodName) {                
+                var newFoodItem = document.createElement("li");
+                    newFoodItem.innerHTML = foodName;
+                foodList.appendChild(newFoodItem);
 
-                function addNewFoodItem(foodName) {
-                    var newFoodItem = document.createElement("li");
-                        newFoodItem.innerHTML = foodName;
-                        foodList.appendChild(newFoodItem);
+                aFoodDetail.foodName = foodName;
+                renderOurTemplate(aFoodDetail, function(markup){
+                    document.getElementById("foodDescription").innerHTML = markup;
+                });
+            }
+
+            //Get all available values from localStorage
+            //And update our list
+
+            for(i=0; i< length; i++) {
+                
+                storedFoodName = window.localStorage.key(i);
+
+                if( storedFoodName.match(/^food([0-9]+)$/) ) {
+                    addNewFoodItem(window.localStorage.getItem(storedFoodName));
                 }
 
-                function showExistingFoodItems(){
-                    for(var i=0; i < length; i++) {
-                        storedFoodName = window.localStorage.key(i);
-                        console.log (storedFoodName);
-                            if(storedFoodName.match(/^food([0-9]+)$/)) {
-                                console.log ("match found");
-                                addNewFoodItem(window.localStorage.getItem(storedFoodName));
-                            }
-                    }
-                }
 
+            }
 
+            //Form submit event handler
+            foodForm.addEventListener("submit", function(evt){
 
-                showExistingFoodItems();
+                evt.preventDefault();
 
-                foodForm.addEventListener("submit", function(evt) {
-                    evt.preventDefault();
-                    var newFood = foodField.value;
-                    var foodkey = "food"+ (window.localStorage.length + 1);
-                    addNewFoodItem(newFood);
-                    window.localStorage.setItem(foodkey, newFood);
-                    foodField.value = '';
-                    return false;
-                }, false);
+                var newFood = foodField.value;
+                var foodKey = "food"+ (window.localStorage.length + 1);
+
+                addNewFoodItem(newFood);
+                window.localStorage.setItem(foodKey, newFood);
+
+                foodField.value = "";
+                return false;
+
             }, false);
-        </script>
-    </head>
-    <body>
-        <div id="main">
-            <h1>List some food</h1>
-            <form id="foodForm">
-                <input type="text" id="foodName" placeholder="Enter your food name" />
-                <button id="submitFood">Tell Us!</button> <br />
-                <button id="clearStorage">Remove Values</button>
-            </form>
-            
-            <ul id="foodList"></ul>
-        </div>
-    </body>
-</html>
+
+        }, false);
+    </script>
+
+</html>  
