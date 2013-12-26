@@ -1,0 +1,26 @@
+<!-- 
+	Mustache Js is a logic-less template system - means it wont contains if-else condistions or for loops.
+-->	
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Mustache.Js Tutorial</title>
+	</head>
+	<body onload="loadtemp()">
+		<p id="person"></p>
+	</body>
+	<script src="js/mustache.js"></script>
+	<script>
+	    // Inline method
+		var view = {
+			name: 'Thomas',
+			occupation : "Web Developer"
+		};
+
+		function loadtemp() {
+			var output = Mustache.render("{{name}} is a {{occupation}}" , view);
+			document.getElementById("person").innerHTML= output;
+		}
+	</script>
+</html>
