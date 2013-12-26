@@ -74,6 +74,42 @@
                 }
 
             }
+
+            function getXHR(url, callback){
+                var req = new XMLHttpRequest();
+                req.onreadystatechange = function() {
+                    if (this.readyState == 4) {
+                        if ( this.status == 200 || this.status ==0) {
+                            callback(this.responseText);
+                        } else {
+                            console.log( "Something went wrong");
+                        }
+                    }
+                }
+
+                req.open("GET", url, true);
+                req.send();
+            }
+
+            //loads an external url througth a script tag
+            // avoids cross-domain restrictions
+            function getJSONP(url, callback) {
+                var s = document.createElement("script"),
+                    path = url + "&callback=jsonpCallback";
+                window.jsonpCallback = callback;
+                s.src = path;
+                document.body.appendChild(s);
+            }
+
+            function parseAndLog(jsonString) {
+                var jsonObj =  jsonString;
+                if ( typeof jsonString == "string") {
+                    jsonObj = JSON.parse(jsonString);
+                    console.log( jsonObj );
+                }
+            }
+
+
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function(){
@@ -128,6 +164,35 @@
                 return false;
 
             }, false);
+
+            // attaching an event delegation to li element
+            document.addEventListener("click" , function(evt){
+                console.log ( evt.target.tagName );
+                if( evt.target.tagName == "LI" ) {
+                    var foodSubject = evt.target.innerHTML;
+                    var foodSearch = encodeURIComponent(foodSubject);
+                    var twitterURL = "http://gentle-shore-1671.herokuapp.com/1.1/search/tweets.json?q="+foodSearch;
+
+                    //getXHR( twitterURL, function(response) {
+                        //var latestTweet = getLatestResult(response);
+                        //var msg = "Latest Tweet about " + foodSubject + " from " + latestTweet.from_user + " : " + latestTweet.text;
+
+                        //alert (msg);
+                       // alert( response );
+                    //});
+
+                    getJSONP(twitterURL, getLatestResult);
+
+
+                }
+            }, false);
+
+            function getLatestResult(response) {
+                //alert( "Aaa= " + response );
+               var twitterPayload = JSON.parse( response );
+               var latestResult = twitterPayload.results[0];
+               alert( latestResult);
+            }
 
         }, false);
     </script>
