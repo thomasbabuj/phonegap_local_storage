@@ -1,5 +1,13 @@
 <!-- 
 	Mustache Js is a logic-less template system - means it wont contains if-else condistions or for loops.
+
+	Inline methoed - prevents the possiblitly of reusable templates.
+
+	Templates as Inline scripts - > define templates data inside of a script tag and include it in the HTML document
+
+	  We must change the MIME type to something other then text/javascript.
+
+
 -->	
 <!DOCTYPE html>
 <html>
@@ -9,18 +17,34 @@
 	</head>
 	<body onload="loadtemp()">
 		<p id="person"></p>
+		<p id="location"></p>
 	</body>
 	<script src="js/mustache.js"></script>
 	<script>
-	    // Inline method
+	    // Inline method	  
 		var view = {
 			name: 'Thomas',
 			occupation : "Web Developer"
 		};
 
 		function loadtemp() {
-			var output = Mustache.render("{{name}} is a {{occupation}}" , view);
+			var output = Mustache.render("<h1>{{name}} is a {{occupation}}</h1>" , view);
 			document.getElementById("person").innerHTML= output;
 		}
 	</script>
+	<!-- Tempates as Inline script -->
+	<script>
+		var view2 = {
+			location : "Singapore"
+		}
+	</script>
+	<script id="sample_template" type="text/html">
+		<h2>{{location}}</h2>
+	</script>
+	<script type='text/javascript'>
+	  var template = document.getElementById('sample_template').innerHTML;
+	  var output = Mustache.render(template, view2);
+	  document.getElementById('location').innerHTML = output;
+	</script>
+		<!-- Tempates as Inline script -->
 </html>
